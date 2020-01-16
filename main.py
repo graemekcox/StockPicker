@@ -1,6 +1,7 @@
 # from data_prep import *
 from portfolio_functions import *
-
+from prep_data import *
+from mean_variance import *
 import sys, getopt
 
 # start = dt.datetime(2016, 6, 8)
@@ -11,49 +12,39 @@ import sys, getopt
 #     pickle.dump(tickers, f)
 # get_custom_stocks()
 
+quandl.ApiConfig.api_key = ""
+
+
+
 def main(argv):
     account_val = parse_arguments(argv) # Account value is passed from arguments
     if account_val <= 0:
         account_val = 20_000 # Default value is $20,000
 
-    print("Account value is ",account_val)
-    
-    tickers = ['SPY','AAPL','MSFT','FB']
+    print("Account value is %0d" % account_val)
+    risk_free_rate = 0.0152 # a 52 Week treasury bill at the start of 2018, was 1.52%
 
-    # account_val = 20000 #how much money in your account
+    stocks = ['AAPL','AMZN','GOOGL','FB', 'MSFT']
+    data = quandl.get_table('WIKI/PRICES', ticker = stocks,
+                            qopts = { 'columns': ['date', 'ticker', 'adj_close'] },
+                            date = { 'gte': '2016-1-1', 'lte': '2017-12-31' }, paginate=True)
 
+    df = data.set_index('date')
+    table = df.pivot(columns='ticker')
+    # By specifying col[1] in below list comprehension
+    # You can select the stock names under multi-level column
+    table.columns = [col[1] for col in table.columns]
+    print(table.head())
 
-    start = dt.datetime(2016, 6, 8)
-    end = dt.datetime.now()
+    ## Mean-variance method
+    display_ef_using_mean_variance(table, risk_free_rate)
 
-    prices_df = pd.DataFrame()
-    prices_df = web.DataReader('SPY', 'yahoo', start, end)
-
-    first_ticker = 1
-    for ticker in tickers:
-
-        df = web.DataReader(ticker, 'yahoo', start, end)
-        # df.reset_index(inplace=True, drop=False)
-
-        if (first_ticker):
-            prices_df = pd.DataFrame(index=df.index)
-            first_ticker = 0
-
-        
-        prices_df[ticker] = df['Adj Close']
-
-
-    print(prices_df.head())
-
-
-    # compile_data()
-
-    # df = pd.read_csv('stock_tickers/AAPL.csv')
-
-    # visualize_data()
-
+    ### OLD WAY
+    save_tickers(stocks, 'output/portfolio_tickers')
+    prices_df = save_ticker_data()
     weights = get_weights(prices_df)
     post_processing_weights(prices_df, weights, account_val)
+
 
 def parse_arguments(argv):
     account_val = 0
@@ -68,11 +59,9 @@ def parse_arguments(argv):
             sys.exit()
         elif opt in ("-a", "--account_val"):
             account_val = arg
-
-    print('Account val is $', account_val)
+            print('Account val is $%0d' % account_val)
 
     return int(account_val)
 
 if __name__ == "__main__":
-    print("START TEST")
     main(sys.argv[1:])
