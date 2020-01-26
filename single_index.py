@@ -9,6 +9,7 @@ from scipy import stats
 from pandas_datareader import data
 
 
+
 # stocks = ["SPY"]
 # start = dt.datetime(2016,1,1)
 # end = dt.datetime(2017,12,31)
@@ -106,9 +107,34 @@ def calculate_CAPM(df_stock, df_market):
     print('P value = ',p_value)
     print('Std err = ',std_err)
     print(45*'-')
-    
+
     beta = slope
     alpha = intercept
+    average_return = X.mean()
+    print('Average Return = ', average_return)    
+    
+    
+    # error = (df_subset['Returns'] - (alpha + beta* df_subset['Market Returns']))**2
+
+    variance = (X- average_return)**2 / len(X) #Find variance in stock returns
+    var = variance.sum()
+    # var = var().mean()
+    # print('Error = ', error)
+    # print('Var = ', var)
+    print('Var = ', var )
+    print('Std Dev = ', np.sqrt(var))
+
+    errors = (X - (alpha + beta * y)) ** 2
+    total_error = errors.sum() / len(errors)
+    print('Error = ', total_error)
+    # std_dev
+    #systematic_risk = sum( .error()) / 752
+
+    # Systematic risk
+    # unsystematic
+    #Total risk = sd of stock returns /
+
+
 
 
     # fig, ax = plt.subplots()
@@ -180,24 +206,8 @@ def calculate_CAPM(df_stock, df_market):
     # print("ALPHA")
 
     # print("BETA") 
-    
-    # # error = (returns - (alpha + beta* market_returns))**2
-    # #var = var().mean()
-    # # std_dev
-    # #systematic_risk = sum( .error()) / 752
-
-    # # Systematic risk
-    # r_2 = model.rsquared
-    # # unsystematic
-    # #Total risk = sd of stock returns /
 
 
-    # print("R-squared = ", r_2)
-    # # print(df.head(5))
-    # print("Average return " + str(average_return))
-
-  
-    # return df
 
 # calculate_beta(df['Adj Close'], df_spy['Adj Close'])
 
