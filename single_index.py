@@ -85,24 +85,30 @@ def calculate_CAPM(df_stock, df_market):
     # plt.show()
     # print(df_subset.head())
 
-
     X = df_subset['Returns']
     y = df_subset['Market Returns']
 
-    denom = X.dot(X) - X.mean() * X.sum()
-    m = (X.dot(y) - y.mean() * X.sum() ) / denom
-    b = (y.mean() * X.dot(X) - X.mean() * X.dot(y)) / denom
-    y_pred = m*X + b
+    coeffs = np.polyfit( X, y, 1)
 
-    plt.scatter(X, y)
-    plt.plot(X, y_pred,'r')
-    plt.show()
+    print(10*'-', 'Linear Regression Results', 10*'-')
+    # TODO, these values are a factor off of the excel document
+    beta = coeffs[1]
+    alpha = coeffs[0]
+    print('Alpha ', alpha)
+    print('Beta ', beta)
 
-    res = y-y_pred
-    tot = y-y.mean()
-
-    R_squared = 1 - res.dot(res) / tot.dot(tot)
-    print(R_squared)
+ 
+    slope, intercept, r_value, p_value, std_err = stats.linregress(X, y)
+    print('Slope = ',slope)
+    print('Intercept = ',intercept)
+    print('R value = ',r_value)
+    print('R squared = ' , r_value**2)
+    print('P value = ',p_value)
+    print('Std err = ',std_err)
+    print(45*'-')
+    
+    beta = slope
+    alpha = intercept
 
 
     # fig, ax = plt.subplots()
