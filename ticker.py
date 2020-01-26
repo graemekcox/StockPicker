@@ -16,8 +16,12 @@ class Ticker:
     std_dev = 0
     r_sqrd = 0
 
+    """
+        Function: plt_scatter
+            Will print all variables, and display scatter plot with line of best fit
+    """
     def plt_scatter(self):
-        print(10*'-', self.ticker_name, ' Calcualted Variables', 10*'-')
+        print(10*'-', self.ticker_name, ' Calculated Variables', 10*'-')
         print('Alpha ', self.alpha)
         print('Beta ', self.beta)
         print('Average Return = ', self.average_return)    
@@ -26,10 +30,21 @@ class Ticker:
         print('Error = ', self.err)
         print(45*'-')
 
-        self.df.plot(x='Market Returns', y='Returns', kind='scatter')
+        X = self.df['Market Returns']
+        y = self.df['Returns']
+        # self.df.plot(x='Market Returns', y='Returns', kind='scatter')
+        plt.scatter(X, y)
+        plt.plot(np.unique(X), np.poly1d(np.polyfit(X, y, 1))(np.unique(X)), color='red')
+        plt.title("Market returns vs %s Returns" % self.ticker_name)
+        plt.xlabel("Market Returns")
+        plt.ylabel("%s Returns"%self.ticker_name)
         plt.show() 
 
-
+    """
+        Function: calculate_regression_params
+            Calculates linear regression with stock and correlated stock returns, and saves
+            variables.
+    """
     def calculate_regression_params(self):
         stock_returns = self.df['Returns']
         market_returns = self.df['Market Returns']
@@ -49,12 +64,15 @@ class Ticker:
         self.err = errors.sum() / len(errors)
         # print('Error = ', total_error)
 
+    """
+        Fucntion: clean_dataframe
+            Prepare dataframe for calculations
+    """
     def clean_dataframe(self):
         self.df['Returns'] = self.df['Adj Close'].pct_change() * 100
         self.df = self.df.dropna(subset=['Returns', 'Market Returns'])
         
         self.calculate_regression_params()
-
 
     """"
         Inputs:
@@ -72,6 +90,5 @@ class Ticker:
 
 
 # aapl = Ticker('AAPL', 'SPY')
-# print(aapl.df.head())
 # aapl.plt_scatter()
 # print('DONE')
