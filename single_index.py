@@ -27,10 +27,7 @@ end = dt.datetime(2019,10,4)
 # std_dev = 0
 # r_sqrd = 0
 
-# end = dt.datetime.now()
 tickers = ['AAPL','MSFT']
-
-# portfolio = Portfolio(tickers, start, end)
 
 stocks = {}
 rf_rate = 1.9 #Risk free rate. Set to 1.9%
@@ -38,25 +35,47 @@ rf_rate = 1.9 #Risk free rate. Set to 1.9%
 portfolio = {}
 excess_returns = {}
 
+sum_5 = 0
+sum_6 = 0
+
+
+df = pd.DataFrame(index=tickers,columns=["Excess Returns",'Excess Returns with Beta'])
+
 for ticker in tickers:
     temp = {}
     stocks[ticker] = Ticker(ticker, 'SPY', start, end)
-    # temp['Stock'] = Ticker(ticker, 'SPY', start, end)
-    temp['Excess Returns'] = stocks[ticker].average_return - (rf_rate/252)
-    temp['Excess Returns over Beta'] = temp['Excess Returns'] / stocks[ticker].beta
+    # stocks[ticker].plt_scatter()
+
+    excess_returns = stocks[ticker].average_return - (rf_rate/252)
+
+    # df['Excess Returns'][ticker] = excess_returns
+    # df['Excess Returns over Beta'][ticker] = (excess_returns * stocks[ticker].beta)/stocks[ticker].err
+    beta_risk = stocks[ticker].beta ** 2 / stocks[ticker].err
     
+    sum_excess_returns += (excess_returns * stocks[ticker].beta)/stocks[ticker].err
+    sum_excess_returns
+
+    sum_beta_risk+= stocks[ticker].beta ** 2 / stocks[ticker].err
+
     portfolio[ticker] = temp
-
     print('Processed %s'%ticker)
-    print(portfolio[ticker])
+    # portfolio[ticker]['Excess Returns'] = stocks[ticker].average_return - (rf_rate/252)
+    # portfolio[ticker]['Excess Returns over Beta'] = (stocks[ticker].average_return - (rf_rate/252))/stocks[ticker].beta
 
 
-print(stocks['AAPL'].plt_scatter())
+    # print(portfolio[ticker])
 
-col_3 = (portfolio['AAPL']['Excess Returns'] * stocks['AAPL'].beta) / stocks['AAPL'].err #unsystematic risk
-print(col_3)
+# print(stocks['AAPL'].plt_scatter())
+
+# col_3 = (portfolio['AAPL']['Excess Returns'] * stocks['AAPL'].beta) / stocks['AAPL'].err #unsystematic risk
+# print(col_3)
 
 # col_4 = (stocks['AAPL'].beta ** 2) / stocks['AAPL'].err
-# print(col_4)
+# print("COL 4 = ",col_4)
+
+
+
+print(df.head())
+
 
 # col_5 = 
