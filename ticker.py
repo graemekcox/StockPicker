@@ -55,9 +55,13 @@ class Ticker:
         self.beta = slope
         self.alpha = intercept
         self.average_return =  stock_returns.mean()
+        self.average_market_return = market_returns.mean()
 
         variance = ( stock_returns- self.average_return)**2 / len( stock_returns) #Find variance in stock returns
+        market_variance = ( market_returns- self.average_market_return)**2 / len( market_returns) #Find variance in stock returns
+        
         self.var = variance.sum()
+        self.market_var = market_variance.sum()
         self.std_dev = np.sqrt(self.var)
 
         errors = (stock_returns - (self.alpha + self.beta *  market_returns)) ** 2
